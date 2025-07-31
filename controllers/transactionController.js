@@ -58,7 +58,6 @@ const addTransaction = async (req, res) => {
       await savingsController.updateSavingsGoalOnExpense(userId, parseFloat(amount));
     }
 
-    req.app.get("io").emit("transaction:added", { userId, transaction });
     res.status(201).json(transaction);
   } catch (err) {
     console.error("Add transaction error:", err.message);
@@ -221,9 +220,6 @@ const updateTransaction = async (req, res) => {
       where: { id: parseInt(id) },
     });
 
-    req.app
-      .get("io")
-      .emit("transaction:updated", { userId, transaction: updatedTransaction });
     res.json(updatedTransaction);
   } catch (err) {
     console.error("Update transaction error:", err.message);
@@ -243,9 +239,7 @@ const deleteTransaction = async (req, res) => {
 
     if (!deleted.count) return res.status(404).json({ error: "Not found" });
 
-    req.app
-      .get("io")
-      .emit("transaction:deleted", { userId, transactionId: parseInt(id) });
+
     res.json({ message: "Transaction deleted successfully" });
   } catch (err) {
     console.error("Delete transaction error:", err.message);
