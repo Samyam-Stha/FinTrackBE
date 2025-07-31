@@ -11,12 +11,7 @@ const httpServer = createServer(app);
 
 // CORS config
 app.use(
-  cors({
-    origin: "http://localhost:5173",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-  })
+  cors()
 );
 
 // Middleware
@@ -37,13 +32,7 @@ app.use("/api/analytics", require("./routes/analyticsRoutes"));
 app.get("/", (req, res) => res.send("API is running..."));
 
 // Socket.IO setup
-const io = new Server(httpServer, {
-  cors: {
-    origin: "http://localhost:5173",
-    methods: ["GET", "POST"],
-    credentials: true
-  }
-});
+const io = new Server(httpServer);
 
 // Socket.IO connection handling
 io.on("connection", (socket) => {
