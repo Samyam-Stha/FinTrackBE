@@ -3,7 +3,6 @@ require('dotenv').config();
 const express = require("express");
 const cors = require("cors");
 const { createServer } = require("http");
-const { Server } = require("socket.io");
 const prisma = require("./prisma/client");
 
 const app = express();
@@ -32,19 +31,19 @@ app.use("/api/analytics", require("./routes/analyticsRoutes"));
 app.get("/", (req, res) => res.send("API is running..."));
 
 // Socket.IO setup
-const io = new Server(httpServer);
+// const io = new Server(httpServer);
 
-// Socket.IO connection handling
-io.on("connection", (socket) => {
-  console.log("Client connected");
+// // Socket.IO connection handling
+// io.on("connection", (socket) => {
+//   console.log("Client connected");
 
-  socket.on("disconnect", () => {
-    console.log("Client disconnected");
-  });
-});
+//   socket.on("disconnect", () => {
+//     console.log("Client disconnected");
+//   });
+// });
 
-// Make io accessible to routes
-app.set("io", io);
+// // Make io accessible to routes
+// app.set("io", io);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
