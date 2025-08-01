@@ -13,6 +13,21 @@ app.use(
   cors()
 );
 
+// Security headers to prevent caching of authenticated responses
+app.use((req, res, next) => {
+  // Prevent caching of API responses
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  
+  // Additional security headers
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  
+  next();
+});
+
 // Middleware
 app.use(express.json());
 

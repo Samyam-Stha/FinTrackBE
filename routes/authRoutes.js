@@ -6,6 +6,8 @@ const authenticate = require("../middleware/authenticate"); // your JWT middlewa
 // Register and Login
 router.post("/register", authController.register);
 router.post("/login", authController.login);
+router.post("/logout", authenticate, authController.logout);
+router.get("/check-auth", authenticate, authController.checkAuth);
 
 // Email verification
 router.post("/verify", authController.verify);

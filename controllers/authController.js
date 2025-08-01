@@ -4,6 +4,9 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { sendVerificationEmail } = require('../email');
 
+// In-memory token blacklist (in production, use Redis or database)
+const tokenBlacklist = new Set();
+
 // Register Controller (with email verification)
 const register = async (req, res) => {
   const { name, email, password } = req.body;
@@ -192,13 +195,61 @@ const verifyPasswordReset = async (req, res) => {
   }
 };
 
+// Logout Controller
+const logout = async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (authHeader) {
+      const token = authHeader.split(" ")[1];
+      // Add token to blacklist
+      tokenBlacklist.add(token);
+      
+      // Set a short expiration for the blacklist entry (optional)
+      setTimeout(() => {
+        tokenBlacklist.delete(token);
+      }, 24 * 60 * 60 * 1000); // 24 hours
+    }
+    
+    return res.status(200).json({ message: "Logged out successfully" });
+  } catch (err) {
+    console.error("Logout Error:", err);
+    return res.status(500).json({ error: "Server error" });
+  }
+};
+
+// Helper function to check if token is blacklisted
+const isTokenBlacklisted = (token) => {
+  return tokenBlacklist.has(token);
+};
+
+// Check Authentication Status
+const checkAuth = async (req, res) => {
+  try {
+    // If middleware reaches here, user is authenticated
+    return res.status(200).json({ 
+      authenticated: true, 
+      user: {
+        id: req.user.id,
+        name: req.user.name,
+        email: req.user.email
+      }
+    });
+  } catch (err) {
+    console.error("Check Auth Error:", err);
+    return res.status(500).json({ error: "Server error" });
+  }
+};
+
 module.exports = {
   register,
   login,
+  logout,
+  checkAuth,
   updateUser,
   deleteAccount,
   verify,
   resendCode,
   requestPasswordReset,
   verifyPasswordReset,
+  isTokenBlacklisted,
 };
